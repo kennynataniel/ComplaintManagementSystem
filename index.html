@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT. Adi Perkasa - Complaint Management System</title>
+<style>
+:root{--primary:#1e3a8a;--primary-light:#3b82f6;--primary-hover:#1d4ed8;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--bg:#f1f5f9;--white:#ffffff;--border:#e2e8f0;--text:#1e293b;--text-muted:#64748b;--sidebar-w:260px}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{background:var(--bg);color:var(--text);overflow:hidden;height:100vh}
+
+/* LOGIN */
+#screen-login{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#2563eb 100%)}
+.login-card{background:white;border-radius:16px;padding:48px 40px;width:420px;box-shadow:0 25px 50px rgba(0,0,0,0.25)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .brand{font-size:22px;font-weight:800;color:var(--primary);letter-spacing:1px}
+.login-logo .subtitle{font-size:13px;color:var(--text-muted);margin-top:4px}
+.login-logo .icon{font-size:48px;margin-bottom:12px}
+.login-card h2{text-align:center;font-size:20px;font-weight:700;margin-bottom:28px;color:var(--text)}
+.form-field{margin-bottom:18px}
+.form-field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px}
+.form-field input,.form-field select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;transition:border-color .2s;background:white;color:var(--text)}
+.form-field input:focus,.form-field select:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.btn-login{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s;margin-top:8px}
+.btn-login:hover{background:var(--primary-hover)}
+.login-hint{text-align:center;font-size:12px;color:var(--text-muted);margin-top:16px}
+
+/* APP SHELL */
+#screen-app{display:none;height:100vh;flex-direction:row}
+#screen-app.visible{display:flex}
+aside{width:var(--sidebar-w);background:var(--primary);display:flex;flex-direction:column;height:100vh;flex-shrink:0}
+.sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-brand .brand-name{color:white;font-size:14px;font-weight:800;letter-spacing:.5px;line-height:1.3}
+.sidebar-brand .brand-sub{color:rgba(255,255,255,.6);font-size:11px;margin-top:2px}
+.sidebar-user{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px;flex-shrink:0}
+.sidebar-user-info{flex:1;overflow:hidden}
+.sidebar-user-name{color:white;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-user-role{color:rgba(255,255,255,.6);font-size:11px;margin-top:1px}
+nav.sidebar-nav{flex:1;overflow-y:auto;padding:12px 0}
+.nav-section{padding:8px 20px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;color:rgba(255,255,255,.75);font-size:13.5px;font-weight:500;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.1);color:white}
+.nav-item.active{background:rgba(255,255,255,.15);color:white;border-left-color:white;font-weight:700}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--danger);color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}
+.nav-badge.warn{background:var(--warning)}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.1)}
+.btn-logout-sidebar{width:100%;padding:9px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.15);border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-logout-sidebar:hover{background:rgba(255,255,255,.2);color:white}
+
+/* MAIN CONTENT */
+.main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:white;border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.topbar-title{font-size:17px;font-weight:700;color:var(--text)}
+.topbar-actions{display:flex;align-items:center;gap:12px}
+.notif-btn{position:relative;width:36px;height:36px;background:var(--bg);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--danger);border-radius:50%;border:2px solid white}
+.content-area{flex:1;overflow-y:auto;padding:28px}
+
+/* PAGE VISIBILITY */
+.page{display:none}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:white;border-radius:10px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px}
+.card-body{padding:20px}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:white;border-radius:10px;border:1px solid var(--border);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.kpi-card .kpi-label{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.kpi-card .kpi-value{font-size:32px;font-weight:800;color:var(--text);line-height:1}
+.kpi-card .kpi-sub{font-size:12px;color:var(--text-muted);margin-top:6px}
+.kpi-card.danger{border-top:3px solid var(--danger)}
+.kpi-card.warning{border-top:3px solid var(--warning)}
+.kpi-card.success{border-top:3px solid var(--success)}
+.kpi-card.primary{border-top:3px solid var(--primary)}
+.kpi-card.info{border-top:3px solid var(--primary-light)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge-registered{background:#fef3c7;color:#d97706}
+.badge-triage{background:#dbeafe;color:#1e40af}
+.badge-investigation{background:#ede9fe;color:#6d28d9}
+.badge-recovery{background:#fce7f3;color:#9d174d}
+.badge-approval{background:#fed7aa;color:#c2410c}
+.badge-closed{background:#d1fae5;color:#065f46}
+.badge-breach{background:#fee2e2;color:#991b1b;animation:pulse 1.5s infinite}
+.badge-reopen{background:#f3f4f6;color:#374151}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.badge-vip{background:#fef3c7;color:#d97706;margin-left:4px}
+.badge-premium{background:#dbeafe;color:#1e40af;margin-left:4px}
+.priority-urgent{background:#fee2e2;color:#dc2626;font-weight:700}
+.priority-high{background:#ffedd5;color:#ea580c;font-weight:700}
+.priority-medium{background:#fef9c3;color:#ca8a04;font-weight:700}
+.priority-low{background:#f3f4f6;color:#4b5563;font-weight:700}
+.channel-tag{background:#f1f5f9;color:#475569;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+
+/* TABLES */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;background:#f8fafc;border-bottom:2px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer}
+tbody tr:hover{background:#f8fafc}
+tbody td{padding:12px 14px;font-size:13.5px;vertical-align:middle}
+.sla-bar{height:6px;background:#e2e8f0;border-radius:3px;width:80px;overflow:hidden;margin-top:4px}
+.sla-fill{height:100%;border-radius:3px;transition:width .3s}
+.sla-ok{background:var(--success)}
+.sla-warn{background:var(--warning)}
+.sla-breach{background:var(--danger)}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-primary{background:var(--primary);color:white}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-success{background:var(--success);color:white}
+.btn-success:hover{background:#059669}
+.btn-danger{background:#fee2e2;color:var(--danger);border:1px solid #fca5a5}
+.btn-danger:hover{background:#fecaca}
+.btn-warning{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
+.btn-warning:hover{background:#fef3c7}
+.btn-secondary{background:#f1f5f9;color:#475569;border:1px solid var(--border)}
+.btn-secondary:hover{background:#e2e8f0}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-outline:hover{background:var(--primary);color:white}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:12px;font-weight:700;color:#374151}
+.form-group label .req{color:var(--danger)}
+.form-control{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13.5px;background:white;color:var(--text);transition:border-color .2s}
+.form-control:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+textarea.form-control{resize:vertical;min-height:80px}
+.form-output{padding:10px 12px;border-radius:7px;font-weight:700;font-size:14px}
+.section-card{background:white;border-radius:10px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.05);padding:22px;margin-bottom:20px}
+.section-card .sec-title{font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;padding-bottom:12px;border-bottom:2px solid var(--bg);margin-bottom:16px}
+.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:14px}
+.info-item label{display:block;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.info-item span{font-size:14px;font-weight:600;color:var(--text)}
+.desc-box{background:#f8fafc;border:1px dashed var(--border);padding:14px;border-radius:7px;font-size:13.5px;line-height:1.6;color:var(--text)}
+
+/* SPLIT LAYOUT */
+.split-layout{display:flex;gap:0;height:calc(100vh - 56px);overflow:hidden}
+.split-left{width:320px;border-right:1px solid var(--border);background:white;display:flex;flex-direction:column;flex-shrink:0}
+.split-right{flex:1;background:var(--bg);overflow-y:auto;padding:24px}
+.list-header{padding:14px 16px;border-bottom:1px solid var(--border)}
+.list-search input{width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px}
+.list-search input:focus{outline:none;border-color:var(--primary-light)}
+.list-body{flex:1;overflow-y:auto}
+.list-item{padding:14px 16px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .15s;border-left:3px solid transparent}
+.list-item:hover{background:#f8fafc}
+.list-item.active{background:#eff6ff;border-left-color:var(--primary)}
+.list-item .item-id{font-size:12px;font-weight:700;color:var(--primary)}
+.list-item .item-name{font-size:14px;font-weight:600;margin:3px 0}
+.list-item .item-snippet{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .item-footer{margin-top:7px;display:flex;justify-content:space-between;align-items:center}
+
+/* TOAST */
+#toast{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast-item{padding:14px 20px;border-radius:10px;color:white;font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.15);opacity:0;transform:translateX(60px);transition:all .35s;pointer-events:all;max-width:360px;display:flex;align-items:center;gap:10px}
+.toast-item.show{opacity:1;transform:translateX(0)}
+.toast-success{background:var(--success)}
+.toast-error{background:var(--danger)}
+.toast-warning{background:var(--warning)}
+.toast-info{background:var(--primary)}
+
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center}
+#modal-overlay.show{display:flex}
+.modal{background:white;border-radius:14px;width:700px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 25px 50px rgba(0,0,0,.2)}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);line-height:1}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
+/* TIMELINE */
+.timeline{padding-left:20px;border-left:2px solid var(--border);margin-top:16px}
+.tl-item{position:relative;padding:0 0 20px 20px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-9px;top:4px;width:16px;height:16px;border-radius:50%;border:2px solid white;box-shadow:0 0 0 2px var(--border)}
+.tl-dot.done{background:var(--success);box-shadow:0 0 0 2px var(--success)}
+.tl-dot.active{background:var(--primary-light);box-shadow:0 0 0 2px var(--primary-light)}
+.tl-dot.pending{background:var(--border)}
+.tl-time{font-size:11px;color:var(--text-muted);margin-bottom:3px}
+.tl-text{font-size:13.5px;font-weight:600}
+.tl-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* SEARCH/FILTER BAR */
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.filter-bar input,.filter-bar select{padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;background:white}
+.filter-bar input{width:240px}
+.filter-bar input:focus,.filter-bar select:focus{outline:none;border-color:var(--primary-light)}
+
+/* APPROVAL CARD */
+.approval-card{background:white;border-radius:10px;border:1px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.approval-card.urgent{border-left:4px solid var(--danger)}
+.approval-card .ap-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.approval-card .ap-meta{font-size:12px;color:var(--text-muted);margin-top:4px}
+
+/* TABS */
+.tab-list{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab{padding:10px 20px;font-size:13.5px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+
+/* SLA INDICATOR */
+.sla-indicator{display:flex;align-items:center;gap:8px}
+.sla-text{font-size:12px;font-weight:600}
+.sla-text.ok{color:var(--success)}
+.sla-text.warn{color:var(--warning)}
+.sla-text.breach{color:var(--danger)}
+
+/* ALERT BANNER */
+.alert{padding:12px 16px;border-radius:8px;font-size:13.5px;font-weight:600;margin-bottom:20px}
+.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.alert-warning{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+.alert-danger{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+
+/* MISC */
+.flex{display:flex}.gap-2{gap:8px}.gap-3{gap:12px}.items-center{align-items:center}.justify-between{justify-content:space-between}.justify-end{justify-content:flex-end}.mt-4{margin-top:16px}.mb-4{margin-bottom:16px}.text-sm{font-size:13px}.text-xs{font-size:11px}.font-bold{font-weight:700}.text-muted{color:var(--text-muted)}.fw-7{font-weight:700}.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.page-title{font-size:20px;font-weight:800;color:var(--text)}.page-sub{font-size:13px;color:var(--text-muted);margin-top:3px}
+</style>
+</head>
+<body>
+
+<!-- ============ TOAST ============ -->
+<div id="toast"></div>
+
+<!-- ============ MODAL OVERLAY ============ -->
+<div id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">Detail Tiket</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="screen-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">🏢</div>
+      <div class="brand">PT. ADI PERKASA</div>
+      <div class="subtitle">Complaint & Service Recovery Management System</div>
+    </div>
+    <h2>Masuk ke Sistem</h2>
+    <div class="form-field">
+      <label>Username</label>
+      <input type="text" id="login-user" value="ahmad.admin" placeholder="Masukkan username">
+    </div>
+    <div class="form-field">
+      <label>Password</label>
+      <input type="password" id="login-pass" value="password123" placeholder="Masukkan password">
+    </div>
+    <div class="form-field">
+      <label>Login Sebagai</label>
+      <select id="login-role">
+        <option value="cs_agent">CS Agent (Customer Service)</option>
+        <option value="complaint_admin" selected>Complaint Admin</option>
+        <option value="unit_pic">Responsible Unit PIC</option>
+        <option value="sro">Service Recovery Officer</option>
+        <option value="supervisor">Supervisor / Manager</option>
+      </select>
+    </div>
+    <button class="btn-login" onclick="doLogin()">🔐 Masuk</button>
+    <div class="login-hint">Demo: Gunakan username & password apapun. Pilih role untuk simulasi tampilan berbeda.</div>
+  </div>
+</div>
+
+<!-- ============ APP SCREEN ============ -->
+<div id="screen-app">
+  <!-- SIDEBAR -->
+  <aside>
+    <div class="sidebar-brand">
+      <div class="brand-name">PT. ADI PERKASA</div>
+      <div class="brand-sub">Complaint Management System</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sb-avatar">A</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name" id="sb-name">Ahmad Admin</div>
+        <div class="sidebar-user-role" id="sb-role">Complaint Admin</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- filled by JS -->
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-logout-sidebar" onclick="doLogout()">↩ Keluar / Ganti Role</button>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAP -->
+  <div class="main-wrap">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-actions">
+        <div class="notif-btn" onclick="showToast('info','3 tiket mendekati batas SLA. Segera tindaklanjuti!')">🔔<span class="notif-dot"></span></div>
+        <span class="text-sm text-muted" id="topbar-date"></span>
+      </div>
+    </div>
+
+    <div class="content-area" id="content-area">
+
+      <!-- ====== PAGE: DASHBOARD ====== -->
+      <div id="page-dashboard" class="page">
+        <div class="page-header">
+          <div><div class="page-title">Dashboard Overview</div><div class="page-sub">Ringkasan status komplain hari ini — 5 Juli 2026</div></div>
+          <button class="btn btn-primary" onclick="navigateTo('page-new-complaint')" id="btn-new-complaint">＋ Catat Komplain Baru</button>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card primary"><div class="kpi-label">Total Aktif</div><div class="kpi-value">18</div><div class="kpi-sub">↑ 3 dari kemarin</div></div>
+          <div class="kpi-card warning"><div class="kpi-label">Menunggu Triase</div><div class="kpi-value">2</div><div class="kpi-sub">Perlu segera diproses</div></div>
+          <div class="kpi-card info"><div class="kpi-label">Dalam Investigasi</div><div class="kpi-value">7</div><div class="kpi-sub">Oleh 4 unit berbeda</div></div>
+          <div class="kpi-card danger"><div class="kpi-label">SLA Breach</div><div class="kpi-value">3</div><div class="kpi-sub">Perlu eskalasi segera</div></div>
+          <div class="kpi-card success"><div class="kpi-label">Selesai Hari Ini</div><div class="kpi-value">5</div><div class="kpi-sub">↑ dari target 4</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+          <div class="card">
+            <div class="card-header"><span class="card-title">⚠️ Peringatan SLA</span><span class="badge badge-breach">3 Pelanggaran</span></div>
+            <div class="card-body" style="padding:0">
+              <table style="width:100%">
+                <thead><tr><th>No. Tiket</th><th>Pelanggan</th><th>Priority</th><th>Status SLA</th></tr></thead>
+                <tbody>
+                  <tr onclick="openTicketModal('CC-20260704-0082')"><td><span style="color:var(--primary);font-weight:700">CC-20260704-0082</span></td><td>Toni Hartanto</td><td><span class="badge priority-high">HIGH</span></td><td><span class="badge badge-breach">⚡ Breach +2 hari</span></td></tr>
+                  <tr onclick="openTicketModal('CC-20260703-0054')"><td><span style="color:var(--primary);font-weight:700">CC-20260703-0054</span></td><td>Rina Susanti</td><td><span class="badge priority-urgent">URGENT</span></td><td><span class="badge badge-breach">⚡ Breach +1 hari</span></td></tr>
+                  <tr onclick="openTicketModal('CC-20260704-0071')"><td><span style="color:var(--primary);font-weight:700">CC-20260704-0071</span></td><td>Lina Wati</td><td><span class="badge priority-high">HIGH</span></td><td><span class="badge badge-approval" style="background:#fffbeb;color:#d97706">⏰ Sisa 2 Jam</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">📊 Distribusi per Kategori</span></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div><div class="flex justify-between text-sm mb-4"><span>Billing / Payment Issue</span><span class="font-bold">6</span></div><div class="sla-bar" style="width:100%"><div class="sla-fill sla-breach" style="width:60%"></div></div></div>
+                <div><div class="flex justify-between text-sm mb-4"><span>System / Technical Issue</span><span class="font-bold">5</span></div><div class="sla-bar" style="width:100%"><div class="sla-fill sla-warn" style="width:50%"></div></div></div>
+                <div><div class="flex justify-between text-sm mb-4"><span>Service Delay</span><span class="font-bold">3</span></div><div class="sla-bar" style="width:100%"><div class="sla-fill sla-ok" style="width:30%"></div></div></div>
+                <div><div class="flex justify-between text-sm mb-4"><span>Product Issue</span><span class="font-bold">2</span></div><div class="sla-bar" style="width:100%"><div class="sla-fill sla-ok" style="width:20%"></div></div></div>
+                <div><div class="flex justify-between text-sm mb-4"><span>Lainnya</span><span class="font-bold">2</span></div><div class="sla-bar" style="width:100%"><div class="sla-fill sla-ok" style="width:20%"></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">🕐 Aktivitas Terbaru</span></div>
+          <div class="card-body">
+            <div class="timeline">
+              <div class="tl-item"><div class="tl-dot done"></div><div class="tl-time">05 Jul 2026 – 10:45</div><div class="tl-text">CC-20260705-0011 | Siti Aminah — Tiket baru masuk via Website Form</div><div class="tl-sub">Dicatat oleh: Beni CS Agent</div></div>
+              <div class="tl-item"><div class="tl-dot done"></div><div class="tl-time">05 Jul 2026 – 09:12</div><div class="tl-text">CC-20260705-0012 | Budi Santoso — Tiket baru masuk via Call Center</div><div class="tl-sub">Dicatat oleh: Andi CS Agent</div></div>
+              <div class="tl-item"><div class="tl-dot active"></div><div class="tl-time">04 Jul 2026 – 16:30</div><div class="tl-text">CC-20260704-0082 | Toni Hartanto — <span style="color:var(--danger)">SLA BREACH! Eskalasi ke Supervisor</span></div><div class="tl-sub">Sistem otomatis mengescalate</div></div>
+              <div class="tl-item"><div class="tl-dot done"></div><div class="tl-time">04 Jul 2026 – 14:00</div><div class="tl-text">CC-20260703-0054 | Rina Susanti — Service Recovery diajukan oleh Dina SRO</div><div class="tl-sub">Menunggu approval Manager</div></div>
+              <div class="tl-item"><div class="tl-dot done"></div><div class="tl-time">03 Jul 2026 – 11:00</div><div class="tl-text">CC-20260702-0031 | Maya Putri — Tiket ditutup, pelanggan konfirmasi puas</div><div class="tl-sub">Closed oleh: Andi CS Agent</div></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- end dashboard -->
+
+      <!-- ====== PAGE: COMPLAINT LIST ====== -->
+      <div id="page-complaints" class="page">
+        <div class="page-header">
+          <div><div class="page-title">Daftar Semua Komplain</div><div class="page-sub">10 tiket aktif & riwayat komplain</div></div>
+          <button class="btn btn-primary" onclick="navigateTo('page-new-complaint')">＋ Catat Komplain Baru</button>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="filter-bar">
+              <input type="text" id="cl-search" placeholder="🔍  Cari no. tiket atau nama pelanggan..." oninput="renderComplaintList()">
+              <select id="cl-status" onchange="renderComplaintList()">
+                <option value="">Semua Status</option>
+                <option value="Registered">Registered</option>
+                <option value="In Triage">In Triage</option>
+                <option value="In Investigation">In Investigation</option>
+                <option value="Service Recovery">Service Recovery</option>
+                <option value="Awaiting Approval">Awaiting Approval</option>
+                <option value="SLA Breach">SLA Breach</option>
+                <option value="Closed">Closed</option>
+              </select>
+              <select id="cl-category" onchange="renderComplaintList()">
+                <option value="">Semua Kategori</option>
+                <option value="Billing">Billing/Payment</option>
+                <option value="System">System/Technical</option>
+                <option value="Service">Service Delay</option>
+                <option value="Product">Product Issue</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>No. Tiket</th><th>Pelanggan</th><th>Kategori</th><th>Channel</th><th>Priority</th><th>Status</th><th>SLA</th><th>Assigned To</th><th>Aksi</th></tr>
+                </thead>
+                <tbody id="complaint-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div><!-- end complaints -->
+
+      <!-- ====== PAGE: NEW COMPLAINT ====== -->
+      <div id="page-new-complaint" class="page">
+        <div class="page-header">
+          <div><div class="page-title">Catat Komplain Baru</div><div class="page-sub">Isi formulir berikut berdasarkan laporan pelanggan</div></div>
+          <span class="badge badge-registered" style="font-size:12px;padding:6px 14px">CS Agent — Logging Screen</span>
+        </div>
+        <div class="section-card">
+          <div class="sec-title">📋 Informasi Pelanggan</div>
+          <div class="form-grid-3">
+            <div class="form-group"><label>Nama Lengkap Pelanggan <span class="req">*</span></label><input type="text" class="form-control" value="Andi Prasetyo" id="nc-name"></div>
+            <div class="form-group"><label>No. Telepon / HP <span class="req">*</span></label><input type="text" class="form-control" value="0821-9988-7766"></div>
+            <div class="form-group"><label>Email</label><input type="email" class="form-control" value="andi.p@gmail.com"></div>
+          </div>
+          <div class="form-grid-3" style="margin-top:14px">
+            <div class="form-group"><label>Tipe Pelanggan</label><select class="form-control"><option>Regular</option><option>Premium</option><option selected>VIP Customer</option></select></div>
+            <div class="form-group"><label>No. Rekening / ID Pelanggan</label><input type="text" class="form-control" value="ACC-001-2024-0897"></div>
+            <div class="form-group"><label>Cabang Terkait</label><select class="form-control"><option>Kantor Pusat Jakarta</option><option>Cabang Surabaya</option><option>Cabang Bandung</option><option>Cabang Medan</option></select></div>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="sec-title">📞 Detail Laporan Komplain</div>
+          <div class="form-grid" style="margin-bottom:14px">
+            <div class="form-group"><label>Channel Masuk <span class="req">*</span></label><select class="form-control"><option>Call Center</option><option selected>WhatsApp</option><option>Email</option><option>Website Form</option><option>Kantor Cabang</option><option>Media Sosial</option></select></div>
+            <div class="form-group"><label>Kategori Awal <span class="req">*</span></label><select class="form-control"><option selected>Billing/Payment Issue</option><option>System / Technical Issue</option><option>Product Issue</option><option>Service Delay</option><option>Officer Service</option><option>Document Error</option></select></div>
+          </div>
+          <div class="form-group full"><label>Deskripsi Keluhan Lengkap <span class="req">*</span></label><textarea class="form-control" style="min-height:110px">Pelanggan mengeluh tagihan bulan Juli 2026 tidak sesuai. Terdapat biaya tambahan sebesar Rp 500.000 yang tidak diketahui asal-usulnya. Sudah komplain via WhatsApp 2 hari lalu tapi belum ada respons dari tim terkait.</textarea></div>
+          <div class="form-grid" style="margin-top:14px">
+            <div class="form-group"><label>Tanggal & Waktu Kejadian</label><input type="text" class="form-control" value="05 Juli 2026, 08:30 WIB"></div>
+            <div class="form-group"><label>Lampiran / Bukti (opsional)</label><input type="text" class="form-control" value="screenshot_tagihan_juli.jpg" placeholder="Nama file..."></div>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button class="btn btn-secondary" onclick="navigateTo('page-complaints')">Batal</button>
+          <button class="btn btn-primary" onclick="submitNewComplaint()">✓ Simpan & Buat Tiket</button>
+        </div>
+      </div><!-- end new-complaint -->
+
+      <!-- ====== PAGE: TRIAGE ====== -->
+      <div id="page-triage" class="page" style="padding:0;height:calc(100vh - 56px);overflow:hidden;display:none">
+      </div><!-- triage filled by JS on navigate -->
+
+      <!-- ====== PAGE: INVESTIGATION ====== -->
+      <div id="page-investigation" class="page">
+        <div class="page-header">
+          <div><div class="page-title">Antrean Investigasi</div><div class="page-sub">Tiket yang ditugaskan ke unit Anda</div></div>
+          <span class="badge badge-investigation" style="font-size:12px;padding:6px 14px">Unit PIC — Investigation Screen</span>
+        </div>
+        <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px;color:var(--text-muted)">TIKET DITUGASKAN (3)</div>
+            <div id="inv-list">
+              <div class="list-item active" onclick="selectInvTicket('CC-20260704-0077')"><div class="item-id">CC-20260704-0077</div><div class="item-name">Hendra Wijaya</div><div class="item-snippet">Produk cacat fisik tidak sesuai spesifikasi...</div><div class="item-footer"><span class="channel-tag">WhatsApp</span><span class="badge priority-high">HIGH</span></div></div>
+              <div class="list-item" onclick="selectInvTicket('CC-20260704-0089')"><div class="item-id">CC-20260704-0089</div><div class="item-name">Dewi Lestari</div><div class="item-snippet">Pengiriman belum tiba setelah 7 hari...</div><div class="item-footer"><span class="channel-tag">Email</span><span class="badge priority-low">LOW</span></div></div>
+              <div class="list-item" onclick="selectInvTicket('CC-20260704-0071')"><div class="item-id">CC-20260704-0071 <span style="color:var(--warning)">⏰</span></div><div class="item-name">Lina Wati</div><div class="item-snippet">Produk warna berbeda dari pesanan...</div><div class="item-footer"><span class="channel-tag">Call Center</span><span class="badge priority-high">HIGH</span></div></div>
+            </div>
+          </div>
+          <div id="inv-detail-panel">
+            <!-- filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== PAGE: SERVICE RECOVERY ====== -->
+      <div id="page-service-recovery" class="page">
+        <div class="page-header">
+          <div><div class="page-title">Pengajuan Service Recovery</div><div class="page-sub">Proposal kompensasi untuk tiket yang membutuhkan service recovery</div></div>
+          <span class="badge badge-recovery" style="font-size:12px;padding:6px 14px">Service Recovery Officer</span>
+        </div>
+        <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px;color:var(--text-muted)">PERLU SERVICE RECOVERY (2)</div>
+            <div class="list-item active" onclick="selectSROTicket('CC-20260703-0045')"><div class="item-id">CC-20260703-0045</div><div class="item-name">Arif Rahman</div><div class="item-snippet">Akun locked 3 hari akibat bug OTP...</div><div class="item-footer"><span class="channel-tag">Media Sosial</span><span class="badge priority-high">HIGH</span></div></div>
+            <div class="list-item" onclick="selectSROTicket('CC-20260703-0054')"><div class="item-id">CC-20260703-0054</div><div class="item-name">Rina Susanti</div><div class="item-snippet">Overcharge Rp 15.000.000 pada invoice...</div><div class="item-footer"><span class="channel-tag">Kantor Cabang</span><span class="badge priority-urgent">URGENT</span></div></div>
+          </div>
+          <div id="sro-detail-panel"></div>
+        </div>
+      </div>
+
+      <!-- ====== PAGE: APPROVAL ====== -->
+      <div id="page-approval" class="page">
+        <div class="page-header">
+          <div><div class="page-title">Antrean Persetujuan</div><div class="page-sub">Pengajuan service recovery menunggu approval</div></div>
+          <span class="badge badge-approval" style="font-size:12px;padding:6px 14px">Supervisor / Manager</span>
+        </div>
+        <div class="alert alert-warning">⚠️ Terdapat 2 pengajuan service recovery menunggu persetujuan Anda. Harap ditindaklanjuti sebelum SLA habis.</div>
+
+        <div class="approval-card urgent">
+          <div class="ap-header">
+            <div><div style="font-size:14px;font-weight:700;color:var(--primary)">CC-20260703-0054 — Rina Susanti (VIP)</div><div class="ap-meta">Diajukan oleh: Dina SRO • 04 Jul 2026 14:00 WIB • <span style="color:var(--danger);font-weight:700">⚡ SLA Breach</span></div></div>
+            <span class="badge priority-urgent">URGENT</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
+            <div><div class="text-xs text-muted">Jenis Recovery</div><div style="font-size:14px;font-weight:700;margin-top:2px">💰 Refund Penuh</div></div>
+            <div><div class="text-xs text-muted">Nilai Kompensasi</div><div style="font-size:14px;font-weight:700;margin-top:2px;color:var(--danger)">Rp 15.000.000</div></div>
+            <div><div class="text-xs text-muted">Kategori Komplain</div><div style="font-size:14px;font-weight:700;margin-top:2px">Billing/Payment Issue</div></div>
+          </div>
+          <div style="background:#f8fafc;border-radius:7px;padding:12px;margin-bottom:16px;font-size:13.5px;line-height:1.6"><strong>Justifikasi:</strong> Pelanggan VIP mengalami overcharge signifikan akibat bug sistem duplikasi tagihan. Tim Finance telah memverifikasi selisih Rp 15.000.000. Refund diperlukan untuk menjaga kepercayaan dan menghindari eskalasi hukum.</div>
+          <div style="margin-bottom:14px"><label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px">Komentar Approval (opsional)</label><textarea class="form-control" style="height:60px" placeholder="Tambahkan catatan jika diperlukan..."></textarea></div>
+          <div class="flex gap-2 justify-end">
+            <button class="btn btn-danger" onclick="processApproval('CC-20260703-0054','reject')">✗ Tolak / Revisi</button>
+            <button class="btn btn-success" onclick="processApproval('CC-20260703-0054','approve')">✓ Setujui & Eksekusi</button>
+          </div>
+        </div>
+
+        <div class="approval-card">
+          <div class="ap-header">
+            <div><div style="font-size:14px;font-weight:700;color:var(--primary)">CC-20260703-0045 — Arif Rahman</div><div class="ap-meta">Diajukan oleh: Dina SRO • 04 Jul 2026 16:00 WIB</div></div>
+            <span class="badge priority-high">HIGH</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px">
+            <div><div class="text-xs text-muted">Jenis Recovery</div><div style="font-size:14px;font-weight:700;margin-top:2px">🎫 Voucher Belanja</div></div>
+            <div><div class="text-xs text-muted">Nilai Kompensasi</div><div style="font-size:14px;font-weight:700;margin-top:2px;color:var(--warning)">Voucher Rp 200.000</div></div>
+            <div><div class="text-xs text-muted">Kategori Komplain</div><div style="font-size:14px;font-weight:700;margin-top:2px">System / Technical Issue</div></div>
+          </div>
+          <div style="background:#f8fafc;border-radius:7px;padding:12px;margin-bottom:16px;font-size:13.5px;line-height:1.6"><strong>Justifikasi:</strong> Pelanggan tidak bisa bertransaksi selama 3 hari akibat bug sistem OTP yang sudah diperbaiki. Voucher diberikan sebagai bentuk permohonan maaf dan kompensasi atas ketidaknyamanan.</div>
+          <div style="margin-bottom:14px"><label style="font-size:12px;font-weight:700;display:block;margin-bottom:6px">Komentar Approval (opsional)</label><textarea class="form-control" style="height:60px" placeholder="Tambahkan catatan jika diperlukan..."></textarea></div>
+          <div class="flex gap-2 justify-end">
+            <button class="btn btn-danger" onclick="processApproval('CC-20260703-0045','reject')">✗ Tolak / Revisi</button>
+            <button class="btn btn-success" onclick="processApproval('CC-20260703-0045','approve')">✓ Setujui & Eksekusi</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== PAGE: REPORTS ====== -->
+      <div id="page-reports" class="page">
+        <div class="page-header">
+          <div><div class="page-title">Laporan & Analitik</div><div class="page-sub">Tren komplain periode Juli 2026</div></div>
+          <div class="flex gap-2">
+            <select class="form-control" style="width:140px;padding:8px 10px;font-size:13px"><option>Juli 2026</option><option>Juni 2026</option><option>Mei 2026</option></select>
+            <button class="btn btn-secondary">📥 Export PDF</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+          <div class="card"><div class="card-header"><span class="card-title">Trend Harian (1–5 Juli)</span></div><div class="card-body">
+            <div style="display:flex;align-items:flex-end;gap:12px;height:120px;padding-top:10px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--primary-light);width:100%;height:40px;border-radius:4px 4px 0 0"></div><span class="text-xs text-muted">1 Jul</span><span class="text-xs font-bold">4</span></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--primary-light);width:100%;height:60px;border-radius:4px 4px 0 0"></div><span class="text-xs text-muted">2 Jul</span><span class="text-xs font-bold">6</span></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--primary-light);width:100%;height:50px;border-radius:4px 4px 0 0"></div><span class="text-xs text-muted">3 Jul</span><span class="text-xs font-bold">5</span></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--warning);width:100%;height:80px;border-radius:4px 4px 0 0"></div><span class="text-xs text-muted">4 Jul</span><span class="text-xs font-bold">8</span></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:var(--danger);width:100%;height:30px;border-radius:4px 4px 0 0"></div><span class="text-xs text-muted">5 Jul</span><span class="text-xs font-bold">3</span></div>
+            </div>
+          </div></div>
+          <div class="card"><div class="card-header"><span class="card-title">Distribusi Channel</span></div><div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="flex items-center gap-2"><span style="flex:0 0 130px;font-size:13px">Call Center</span><div style="flex:1;background:#e2e8f0;height:10px;border-radius:5px"><div style="background:var(--primary);height:100%;width:35%;border-radius:5px"></div></div><span class="text-xs font-bold" style="margin-left:8px">35%</span></div>
+              <div class="flex items-center gap-2"><span style="flex:0 0 130px;font-size:13px">WhatsApp</span><div style="flex:1;background:#e2e8f0;height:10px;border-radius:5px"><div style="background:#25d366;height:100%;width:25%;border-radius:5px"></div></div><span class="text-xs font-bold" style="margin-left:8px">25%</span></div>
+              <div class="flex items-center gap-2"><span style="flex:0 0 130px;font-size:13px">Website Form</span><div style="flex:1;background:#e2e8f0;height:10px;border-radius:5px"><div style="background:var(--primary-light);height:100%;width:20%;border-radius:5px"></div></div><span class="text-xs font-bold" style="margin-left:8px">20%</span></div>
+              <div class="flex items-center gap-2"><span style="flex:0 0 130px;font-size:13px">Email</span><div style="flex:1;background:#e2e8f0;height:10px;border-radius:5px"><div style="background:var(--warning);height:100%;width:12%;border-radius:5px"></div></div><span class="text-xs font-bold" style="margin-left:8px">12%</span></div>
+              <div class="flex items-center gap-2"><span style="flex:0 0 130px;font-size:13px">Kantor Cabang</span><div style="flex:1;background:#e2e8f0;height:10px;border-radius:5px"><div style="background:var(--success);height:100%;width:8%;border-radius:5px"></div></div><span class="text-xs font-bold" style="margin-left:8px">8%</span></div>
+            </div>
+          </div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Ringkasan Kinerja SLA</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+              <div style="text-align:center;padding:16px;background:#f0fdf4;border-radius:8px"><div style="font-size:28px;font-weight:800;color:var(--success)">73%</div><div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-top:4px">Selesai Tepat Waktu</div></div>
+              <div style="text-align:center;padding:16px;background:#fffbeb;border-radius:8px"><div style="font-size:28px;font-weight:800;color:var(--warning)">14%</div><div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-top:4px">Hampir SLA (80–100%)</div></div>
+              <div style="text-align:center;padding:16px;background:#fee2e2;border-radius:8px"><div style="font-size:28px;font-weight:800;color:var(--danger)">13%</div><div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-top:4px">Melewati SLA</div></div>
+              <div style="text-align:center;padding:16px;background:#eff6ff;border-radius:8px"><div style="font-size:28px;font-weight:800;color:var(--primary)">2.4 hr</div><div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-top:4px">Rata-rata Waktu Resolusi</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content-area -->
+  </div><!-- end main-wrap -->
+</div><!-- end screen-app -->
+
+<script>
+// ============ DATA ============
+const complaints = [
+  {id:'CC-20260705-0012',customer:'Budi Santoso',type:'VIP',contact:'0812-3456-7890',channel:'Call Center',initCat:'Billing/Payment Issue',category:'Billing/Payment Issue',severity:'High',priority:'HIGH',sla:'1 Hari Kerja',slaPercent:5,status:'Registered',assigned:null,loggedBy:'Andi CS Agent',date:'05 Jul 2026 09:12',desc:'Pelanggan mengeluhkan dana tabungannya terpotong dua kali pada transaksi autodebet Bank Mandiri masing-masing sebesar Rp 2.500.000,- saldo di mutasi terpotong total Rp 5.000.000,- namun kuota kredit yang terisi di aplikasi perusahaan hanya bernilai satu kali transaksi.'},
+  {id:'CC-20260705-0011',customer:'Siti Aminah',type:'Regular',contact:'0857-1122-3344',channel:'Website Form',initCat:'System / Technical Issue',category:'System / Technical Issue',severity:'Medium',priority:'MEDIUM',sla:'3 Hari Kerja',slaPercent:15,status:'In Triage',assigned:null,loggedBy:'Beni CS Agent',date:'05 Jul 2026 10:45',desc:'Pelanggan gagal masuk ke dashboard payment gateway dan sistem terus melemparkan pesan galat HTTP Error 500 setiap kali menekan tombol bayar menggunakan QRIS.'},
+  {id:'CC-20260704-0089',customer:'Dewi Lestari',type:'Regular',contact:'0821-5678-9012',channel:'Email',initCat:'Service Delay',category:'Service Delay',severity:'Low',priority:'LOW',sla:'5 Hari Kerja',slaPercent:40,status:'In Investigation',assigned:'Logistics Team',loggedBy:'Citra CS Agent',date:'04 Jul 2026 14:30',desc:'Paket pengiriman sudah 7 hari belum tiba sesuai jadwal. Tracking menunjukkan paket masih di hub Cengkareng sejak 2 hari lalu tanpa update.'},
+  {id:'CC-20260704-0082',customer:'Toni Hartanto',type:'Premium',contact:'0878-3344-5566',channel:'Call Center',initCat:'Service Delay',category:'Service Delay',severity:'High',priority:'HIGH',sla:'1 Hari Kerja',slaPercent:110,status:'SLA Breach',assigned:'Logistics Team',loggedBy:'Dani CS Agent',date:'04 Jul 2026 11:00',breach:true,desc:'Pengiriman barang urgent sudah melewati 3 hari padahal dijanjikan next day delivery. Pelanggan membutuhkan barang untuk keperluan bisnis mendesak.'},
+  {id:'CC-20260704-0077',customer:'Hendra Wijaya',type:'VIP',contact:'0852-6677-8899',channel:'WhatsApp',initCat:'Product Issue',category:'Product Issue',severity:'High',priority:'HIGH',sla:'1 Hari Kerja',slaPercent:70,status:'In Investigation',assigned:'Quality Control',loggedBy:'Eka CS Agent',date:'04 Jul 2026 09:15',desc:'Produk yang diterima dalam kondisi cacat fisik — terdapat retak pada bagian sudut dan warna tidak sesuai katalog. Pelanggan meminta penggantian unit baru.'},
+  {id:'CC-20260703-0054',customer:'Rina Susanti',type:'VIP',contact:'0813-4455-6677',channel:'Kantor Cabang',initCat:'Billing/Payment Issue',category:'Billing/Payment Issue',severity:'Critical',priority:'URGENT',sla:'4 Jam Kerja',slaPercent:115,status:'Awaiting Approval',assigned:'Finance Dept',loggedBy:'Fani CS Agent',date:'03 Jul 2026 10:00',breach:true,recovery:{type:'Refund Penuh',amount:'Rp 15.000.000',justification:'Overcharge akibat bug duplikasi tagihan. Finance telah memverifikasi selisih.'},desc:'Overcharge Rp 15.000.000 pada tagihan invoice bulan lalu akibat duplikasi billing di sistem. Sudah eskalasi ke manager cabang.'},
+  {id:'CC-20260703-0045',customer:'Arif Rahman',type:'Regular',contact:'0877-2233-4455',channel:'Media Sosial',initCat:'System / Technical Issue',category:'System / Technical Issue',severity:'High',priority:'HIGH',sla:'1 Hari Kerja',slaPercent:85,status:'Service Recovery',assigned:'IT Core Banking',loggedBy:'Gani CS Agent',date:'03 Jul 2026 15:30',recovery:{type:'Voucher Belanja',amount:'Voucher Rp 200.000',justification:'Akun locked 3 hari akibat bug OTP. Voucher sebagai permohonan maaf.'},desc:'Akun pelanggan terkunci selama 3 hari akibat bug sistem OTP yang sudah diperbaiki, namun pelanggan tidak bisa bertransaksi sama sekali.'},
+  {id:'CC-20260702-0031',customer:'Maya Putri',type:'Regular',contact:'0856-9988-7766',channel:'Email',initCat:'Officer Service',category:'Officer Service',severity:'Medium',priority:'MEDIUM',sla:'3 Hari Kerja',slaPercent:100,status:'Closed',assigned:'Customer Care Branch',loggedBy:'Hani CS Agent',date:'02 Jul 2026 13:00',rootCause:'Petugas kurang terlatih dalam SOP pelayanan pelanggan premium.',corrective:'Pelatihan customer service untuk seluruh petugas cabang dijadwalkan bulan ini.',desc:'Petugas cabang tidak ramah dan tidak membantu saat pengajuan kredit. Pelanggan merasa diabaikan.'},
+  {id:'CC-20260701-0015',customer:'Doni Kusuma',type:'Regular',contact:'0819-5544-3322',channel:'Website Form',initCat:'Document Error',category:'Document Error',severity:'Low',priority:'LOW',sla:'5 Hari Kerja',slaPercent:100,status:'Closed',assigned:'Admin Document',loggedBy:'Indi CS Agent',date:'01 Jul 2026 10:00',rootCause:'Kesalahan input nama di sistem CRM saat onboarding awal.',corrective:'Proses verifikasi ganda diterapkan untuk penerbitan dokumen kontrak.',desc:'Kesalahan penulisan nama pada dokumen kontrak yang dikirimkan. Nama depan terpotong satu huruf.'},
+  {id:'CC-20260704-0071',customer:'Lina Wati',type:'VIP',contact:'0811-6677-8899',channel:'Call Center',initCat:'Product Issue',category:'Product Issue',severity:'Medium',priority:'HIGH',sla:'1 Hari Kerja',slaPercent:90,nearSla:true,status:'In Investigation',assigned:'Quality Control',loggedBy:'Jani CS Agent',date:'04 Jul 2026 16:00',desc:'Produk yang diterima memiliki warna berbeda dari yang tertera di foto katalog (Merah Marun vs Merah Terang). Pelanggan ingin penggantian atau refund.'},
+];
+
+// ============ STATE ============
+let currentRole = 'complaint_admin';
+let currentPage = 'page-dashboard';
+let currentUser = {name:'Ahmad Admin',role:'Complaint Admin',abbr:'A'};
+
+const roleConfig = {
+  cs_agent:       {name:'Andi CS Agent',   role:'CS Agent',            abbr:'A', nav:['dashboard','complaints','new-complaint','reports']},
+  complaint_admin:{name:'Kenny Nataniel',  role:'Complaint Admin',     abbr:'K', nav:['dashboard','complaints','triage','reports']},
+  unit_pic:       {name:'Budi PIC',        role:'Responsible Unit PIC',abbr:'B', nav:['dashboard','complaints','investigation','reports']},
+  sro:            {name:'Dina SRO',        role:'Service Recovery Officer',abbr:'D', nav:['dashboard','complaints','service-recovery','reports']},
+  supervisor:     {name:'Sari Supervisor', role:'Supervisor / Manager', abbr:'S', nav:['dashboard','complaints','approval','reports']},
+};
+
+const navItems = {
+  'dashboard':       {icon:'📊', label:'Dashboard', page:'page-dashboard'},
+  'complaints':      {icon:'📋', label:'Daftar Komplain', page:'page-complaints'},
+  'new-complaint':   {icon:'➕', label:'Catat Komplain', page:'page-new-complaint'},
+  'triage':          {icon:'🔀', label:'Antrean Triase', page:'page-triage', badge:'2'},
+  'investigation':   {icon:'🔍', label:'Queue Investigasi', page:'page-investigation', badge:'3'},
+  'service-recovery':{icon:'🛠️', label:'Service Recovery', page:'page-service-recovery', badge:'2'},
+  'approval':        {icon:'✅', label:'Antrean Approval', page:'page-approval', badge:'2', badgeClass:'warn'},
+  'reports':         {icon:'📈', label:'Laporan & Analitik', page:'page-reports'},
+};
+
+// ============ LOGIN ============
+function doLogin(){
+  currentRole = document.getElementById('login-role').value;
+  const cfg = roleConfig[currentRole];
+  currentUser = {name:cfg.name, role:cfg.role, abbr:cfg.abbr};
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('screen-app').classList.add('visible');
+  document.getElementById('sb-name').textContent = cfg.name;
+  document.getElementById('sb-role').textContent = cfg.role;
+  document.getElementById('sb-avatar').textContent = cfg.abbr;
+  document.getElementById('topbar-date').textContent = 'Sabtu, 5 Juli 2026';
+  renderNav();
+  navigateTo('page-dashboard');
+}
+
+function doLogout(){
+  document.getElementById('screen-app').classList.remove('visible');
+  document.getElementById('screen-login').style.display = 'flex';
+}
+
+// ============ NAV ============
+function renderNav(){
+  const nav = document.getElementById('sidebar-nav');
+  const cfg = roleConfig[currentRole];
+  nav.innerHTML = '<div class="nav-section">Menu Utama</div>';
+  cfg.nav.forEach(key => {
+    const item = navItems[key];
+    const badge = item.badge ? `<span class="nav-badge ${item.badgeClass||''}">${item.badge}</span>` : '';
+    nav.innerHTML += `<div class="nav-item" id="nav-${key}" onclick="navigateTo('${item.page}')">${item.icon ? `<span class="nav-icon">${item.icon}</span>` : ''}<span>${item.label}</span>${badge}</div>`;
+  });
+}
+
+function navigateTo(pageId){
+  document.querySelectorAll('.page').forEach(p => {p.classList.remove('active'); p.style.display='none'});
+  const pg = document.getElementById(pageId);
+  if(!pg) return;
+
+  if(pageId === 'page-triage'){
+    pg.style.display='flex';
+    renderTriagePage(pg);
+  } else {
+    pg.style.display='block';
+  }
+  pg.classList.add('active');
+  currentPage = pageId;
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const key = Object.keys(navItems).find(k => navItems[k].page === pageId);
+  if(key) document.getElementById('nav-'+key)?.classList.add('active');
+
+  const titles = {
+    'page-dashboard':'Dashboard Overview',
+    'page-complaints':'Daftar Semua Komplain',
+    'page-new-complaint':'Catat Komplain Baru',
+    'page-triage':'Triase & Penugasan',
+    'page-investigation':'Antrean Investigasi',
+    'page-service-recovery':'Pengajuan Service Recovery',
+    'page-approval':'Antrean Persetujuan',
+    'page-reports':'Laporan & Analitik',
+  };
+  document.getElementById('topbar-title').textContent = titles[pageId]||'';
+
+  if(pageId === 'page-complaints') renderComplaintList();
+  if(pageId === 'page-investigation') selectInvTicket('CC-20260704-0077');
+  if(pageId === 'page-service-recovery') selectSROTicket('CC-20260703-0045');
+}
+
+// ============ COMPLAINT LIST ============
+function getStatusBadge(c){
+  const map = {
+    'Registered':'badge-registered','In Triage':'badge-triage',
+    'In Investigation':'badge-investigation','Service Recovery':'badge-recovery',
+    'Awaiting Approval':'badge-approval','SLA Breach':'badge-breach',
+    'Closed':'badge-closed','Re-opened':'badge-reopen',
+  };
+  return `<span class="badge ${map[c.status]||'badge-registered'}">${c.breach?'⚡ ':c.nearSla?'⏰ ':''}${c.status}</span>`;
+}
+function getPriorityBadge(p){
+  const map={URGENT:'priority-urgent',HIGH:'priority-high',MEDIUM:'priority-medium',LOW:'priority-low'};
+  return `<span class="badge ${map[p]||'priority-low'}">${p}</span>`;
+}
+function getSlaBar(c){
+  const pct = Math.min(c.slaPercent,120);
+  const cls = pct>=100?'sla-breach':pct>=80?'sla-warn':'sla-ok';
+  return `<div class="text-xs" style="margin-bottom:3px">${c.sla}</div><div class="sla-bar"><div class="sla-fill ${cls}" style="width:${Math.min(pct,100)}%"></div></div>`;
+}
+function renderComplaintList(){
+  const search = (document.getElementById('cl-search')?.value||'').toLowerCase();
+  const status = document.getElementById('cl-status')?.value||'';
+  const cat = document.getElementById('cl-category')?.value||'';
+  const filtered = complaints.filter(c=>{
+    const matchSearch = !search || c.id.toLowerCase().includes(search) || c.customer.toLowerCase().includes(search);
+    const matchStatus = !status || c.status === status;
+    const matchCat = !cat || c.category.toLowerCase().includes(cat.toLowerCase());
+    return matchSearch && matchStatus && matchCat;
+  });
+  const tbody = document.getElementById('complaint-table-body');
+  if(!tbody) return;
+  tbody.innerHTML = filtered.map(c=>`
+    <tr onclick="openTicketModal('${c.id}')">
+      <td><span style="color:var(--primary);font-weight:700;font-size:12px">${c.id}</span></td>
+      <td><div style="font-weight:600">${c.customer}</div><div class="text-xs text-muted">${c.date}</div></td>
+      <td><span class="text-sm">${c.category}</span></td>
+      <td><span class="channel-tag">${c.channel}</span></td>
+      <td>${getPriorityBadge(c.priority)}</td>
+      <td>${getStatusBadge(c)}</td>
+      <td>${getSlaBar(c)}</td>
+      <td><span class="text-sm ${c.assigned?'':'text-muted'}">${c.assigned||'—'}</span></td>
+      <td><button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openTicketModal('${c.id}')">Detail</button></td>
+    </tr>`).join('');
+}
+
+// ============ TRIAGE PAGE ============
+const trQueue = complaints.filter(c=>c.status==='Registered'||c.status==='In Triage');
+let selectedTriageId = trQueue[0]?.id;
+
+function renderTriagePage(container){
+  container.innerHTML = `
+  <div class="split-left" style="width:330px">
+    <div class="list-header">
+      <div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:10px">ANTREAN TRIASE (${trQueue.length})</div>
+      <div class="list-search"><input type="text" placeholder="🔍  Cari tiket..." id="tr-search" oninput="filterTriageList()"></div>
+    </div>
+    <div class="list-body" id="triage-list">
+      ${trQueue.map(c=>`
+        <div class="list-item ${c.id===selectedTriageId?'active':''}" id="tri-card-${c.id.replace(/-/g,'')}" onclick="selectTriageTicket('${c.id}')">
+          <div class="item-id">${c.id}</div>
+          <div class="item-name">${c.customer} ${c.type==='VIP'?'<span class="badge badge-vip">VIP</span>':''}</div>
+          <div class="item-snippet">${c.desc.substring(0,55)}...</div>
+          <div class="item-footer"><span class="channel-tag">${c.channel}</span>${getStatusBadge(c)}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+  <div class="split-right" id="triage-right">
+  </div>`;
+  renderTriageDetail(selectedTriageId);
+}
+
+function filterTriageList(){
+  const q = document.getElementById('tr-search')?.value?.toLowerCase()||'';
+  trQueue.forEach(c=>{
+    const el = document.getElementById('tri-card-'+c.id.replace(/-/g,''));
+    if(el) el.style.display = (!q || c.customer.toLowerCase().includes(q)||c.id.toLowerCase().includes(q)) ? 'block' : 'none';
+  });
+}
+
+function selectTriageTicket(id){
+  selectedTriageId = id;
+  document.querySelectorAll('#triage-list .list-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tri-card-'+id.replace(/-/g,''))?.classList.add('active');
+  renderTriageDetail(id);
+}
+
+function renderTriageDetail(id){
+  const c = complaints.find(x=>x.id===id);
+  if(!c) return;
+  const right = document.getElementById('triage-right');
+  if(!right) return;
+  right.innerHTML = `
+    <div id="triage-alert" style="display:none" class="alert"></div>
+    <div class="section-card">
+      <div class="sec-title">📝 Ringkasan Tiket Masuk</div>
+      <div class="info-row">
+        <div class="info-item"><label>Nama Pelanggan</label><span>${c.customer} ${c.type==='VIP'?'<span class="badge badge-vip">VIP</span>':c.type==='Premium'?'<span class="badge badge-premium">Premium</span>':''}</span></div>
+        <div class="info-item"><label>Channel Masuk</label><span>${c.channel}</span></div>
+        <div class="info-item"><label>Tanggal Laporan</label><span>${c.date} WIB</span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-item"><label>Kontak</label><span>${c.contact}</span></div>
+        <div class="info-item"><label>Kategori Awal (CS)</label><span>${c.initCat}</span></div>
+        <div class="info-item"><label>Dicatat oleh</label><span>${c.loggedBy}</span></div>
+      </div>
+      <div class="form-group" style="margin-top:12px"><label>Deskripsi Masalah</label><div class="desc-box">"${c.desc}"</div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="sec-title">🔀 Formulir Triase & Penugasan Unit</div>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group"><label>Kategori Final <span class="req">*</span></label>
+          <select class="form-control" id="tri-cat">
+            <option ${c.category==='Billing/Payment Issue'?'selected':''}>Billing/Payment Issue</option>
+            <option ${c.category==='System / Technical Issue'?'selected':''}>System / Technical Issue</option>
+            <option ${c.category==='Product Issue'?'selected':''}>Product Issue</option>
+            <option ${c.category==='Service Delay'?'selected':''}>Service Delay</option>
+            <option ${c.category==='Officer Service'?'selected':''}>Officer Service</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Severity <span class="req">*</span></label>
+          <select class="form-control" id="tri-sev" onchange="triCalcPriority()">
+            <option ${c.severity==='Low'?'selected':''}>Low</option>
+            <option ${c.severity==='Medium'?'selected':''}>Medium</option>
+            <option ${c.severity==='High'?'selected':''}>High</option>
+            <option ${c.severity==='Critical'?'selected':''}>Critical</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group"><label>Prioritas (Otomatis)</label><div class="form-output" id="tri-priority" style="background:#ffedd5;color:#ea580c;border:1px solid #fed7aa">${c.priority} PRIORITY</div></div>
+        <div class="form-group"><label>Target SLA Resolusi</label><div class="form-output" id="tri-sla" style="background:#fffbeb;color:#b45309;border:1px solid #fde68a">${c.sla}</div></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group"><label>Primary Responsible Unit <span class="req">*</span></label>
+          <select class="form-control" id="tri-unit">
+            <option value="">-- Pilih Unit Kerja --</option>
+            <option ${c.assigned==='IT Core Banking'?'selected':''}>IT Core Banking & Settlement Ops</option>
+            <option ${c.assigned==='Finance Dept'?'selected':''}>Finance & Accounting Department</option>
+            <option ${c.assigned==='Logistics Team'?'selected':''}>Logistics & Delivery Operational</option>
+            <option ${c.assigned==='Quality Control'?'selected':''}>Quality Control Team</option>
+            <option ${c.assigned==='Customer Care Branch'?'selected':''}>Customer Care - Kantor Cabang</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Supporting Unit (Opsional)</label>
+          <select class="form-control">
+            <option value="">-- Tidak Ada --</option>
+            <option>Finance & Accounting Department</option>
+            <option>Legal & Compliance Risk Team</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px"><label>Catatan Instruksi untuk PIC</label><textarea class="form-control" placeholder="Tulis instruksi investigasi spesifik untuk PIC Unit..."></textarea></div>
+      <div class="flex justify-end gap-3">
+        <button class="btn btn-danger" onclick="triNeedInfo('${c.id}')">⚠ Need More Information</button>
+        <button class="btn btn-primary" onclick="triSubmit('${c.id}')">✓ Submit & Route Ticket</button>
+      </div>
+    </div>`;
+
+  triCalcPriority();
+}
+
+function triCalcPriority(){
+  const sev = document.getElementById('tri-sev')?.value;
+  const isVip = complaints.find(x=>x.id===selectedTriageId)?.type === 'VIP';
+  const p = document.getElementById('tri-priority');
+  const s = document.getElementById('tri-sla');
+  if(!p||!s) return;
+  if(sev==='Critical'){p.textContent='URGENT PRIORITY';p.style.cssText='background:#fee2e2;color:#dc2626;border:1px solid #fca5a5';s.textContent='4 Jam Kerja';}
+  else if(sev==='High'||(sev==='Medium'&&isVip)){p.textContent='HIGH PRIORITY';p.style.cssText='background:#ffedd5;color:#ea580c;border:1px solid #fed7aa';s.textContent='1 Hari Kerja';}
+  else if(sev==='Medium'){p.textContent='MEDIUM PRIORITY';p.style.cssText='background:#fef9c3;color:#ca8a04;border:1px solid #fef08a';s.textContent='3 Hari Kerja';}
+  else{p.textContent='LOW PRIORITY';p.style.cssText='background:#f3f4f6;color:#4b5563;border:1px solid #e5e7eb';s.textContent='5 Hari Kerja';}
+}
+
+function triSubmit(id){
+  showAlert('triage-alert','success','✓ Sukses: Tiket berhasil diklasifikasi dan dialokasikan ke Responsible Unit PIC!');
+  showToast('success','Tiket '+id+' berhasil di-route ke Unit PIC');
+}
+function triNeedInfo(id){
+  showAlert('triage-alert','warning','⚠ Status diubah menjadi "Need More Information". CS Agent akan menghubungi pelanggan.');
+  showToast('warning','Tiket '+id+' membutuhkan informasi tambahan');
+}
+
+// ============ INVESTIGATION ============
+function selectInvTicket(id){
+  document.querySelectorAll('#inv-list .list-item').forEach(el=>el.classList.remove('active'));
+  const c = complaints.find(x=>x.id===id);
+  if(!c) return;
+  document.querySelector(`#inv-list .list-item[onclick*="${id}"]`)?.classList.add('active');
+  const panel = document.getElementById('inv-detail-panel');
+  if(!panel) return;
+  panel.innerHTML = `
+    <div id="inv-alert" style="display:none" class="alert"></div>
+    <div class="section-card">
+      <div class="sec-title">📋 Detail Tiket — ${c.id}</div>
+      <div class="info-row">
+        <div class="info-item"><label>Pelanggan</label><span>${c.customer} ${c.type==='VIP'?'<span class="badge badge-vip">VIP</span>':''}</span></div>
+        <div class="info-item"><label>Kategori</label><span>${c.category}</span></div>
+        <div class="info-item"><label>Priority</label><span>${getPriorityBadge(c.priority)}</span></div>
+      </div>
+      <div class="form-group" style="margin-top:10px"><label>Deskripsi Keluhan</label><div class="desc-box">"${c.desc}"</div></div>
+    </div>
+    <div class="section-card">
+      <div class="sec-title">🔍 Laporan Investigasi & Corrective Action</div>
+      <div class="form-group" style="margin-bottom:16px"><label>Root Cause Analysis <span class="req">*</span></label><textarea class="form-control" style="min-height:90px" placeholder="Jelaskan akar penyebab masalah secara detail..." id="inv-root">${c.rootCause||''}</textarea></div>
+      <div class="form-group" style="margin-bottom:16px"><label>Corrective Action yang Diambil <span class="req">*</span></label><textarea class="form-control" style="min-height:90px" placeholder="Jelaskan tindakan perbaikan yang sudah/akan dilakukan..." id="inv-action">${c.corrective||''}</textarea></div>
+      <div class="form-group" style="margin-bottom:16px"><label>Bukti Penyelesaian (opsional)</label><input type="text" class="form-control" placeholder="Nama file atau nomor referensi dokumen..."></div>
+      <div class="form-group" style="margin-bottom:16px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="inv-need-recovery" onchange="toggleRecoveryNote()"> Komplain ini membutuhkan Service Recovery / Kompensasi</label></div>
+      <div id="recovery-note" style="display:none;background:#fef3c7;border:1px solid #fde68a;border-radius:7px;padding:12px;margin-bottom:16px;font-size:13px;font-weight:600;color:#92400e">⚠ Tiket akan diteruskan ke Service Recovery Officer untuk pengajuan kompensasi setelah Anda submit.</div>
+      <div class="flex justify-end gap-3">
+        <button class="btn btn-secondary" onclick="navigateTo('page-dashboard')">Batal</button>
+        <button class="btn btn-primary" onclick="submitInvestigation('${c.id}')">✓ Submit Laporan Investigasi</button>
+      </div>
+    </div>`;
+}
+
+function toggleRecoveryNote(){
+  const note = document.getElementById('recovery-note');
+  if(note) note.style.display = document.getElementById('inv-need-recovery').checked ? 'block' : 'none';
+}
+function submitInvestigation(id){
+  showAlert('inv-alert','success','✓ Laporan investigasi berhasil disimpan. Tiket diperbarui ke status "Resolved Pending Closure".');
+  showToast('success','Investigasi '+id+' berhasil disubmit');
+}
+
+// ============ SERVICE RECOVERY ============
+function selectSROTicket(id){
+  const c = complaints.find(x=>x.id===id);
+  if(!c) return;
+  document.querySelectorAll('#page-service-recovery .list-item').forEach(el=>el.classList.remove('active'));
+  document.querySelector(`#page-service-recovery .list-item[onclick*="${id}"]`)?.classList.add('active');
+  const panel = document.getElementById('sro-detail-panel');
+  if(!panel) return;
+  panel.innerHTML = `
+    <div id="sro-alert" style="display:none" class="alert"></div>
+    <div class="section-card">
+      <div class="sec-title">📋 Ringkasan Tiket — ${c.id}</div>
+      <div class="info-row">
+        <div class="info-item"><label>Pelanggan</label><span>${c.customer} ${c.type==='VIP'?'<span class="badge badge-vip">VIP</span>':''}</span></div>
+        <div class="info-item"><label>Priority</label>${getPriorityBadge(c.priority)}</div>
+        <div class="info-item"><label>Status</label>${getStatusBadge(c)}</div>
+      </div>
+      <div class="form-group" style="margin-top:10px"><label>Deskripsi Keluhan</label><div class="desc-box">"${c.desc}"</div></div>
+    </div>
+    <div class="section-card">
+      <div class="sec-title">🛠️ Formulir Pengajuan Service Recovery</div>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group"><label>Jenis Recovery <span class="req">*</span></label>
+          <select class="form-control" id="sro-type" onchange="toggleSROAmount()">
+            <option>Refund Penuh</option>
+            <option>Refund Parsial</option>
+            <option selected>Voucher Belanja</option>
+            <option>Penggantian Produk (Replacement)</option>
+            <option>Free Service</option>
+            <option>Permohonan Maaf Resmi</option>
+          </select>
+        </div>
+        <div class="form-group" id="sro-amount-group"><label>Nilai Kompensasi</label><input type="text" class="form-control" id="sro-amount" value="${c.recovery?.amount||''}" placeholder="Rp 0 atau keterangan..."></div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px"><label>Justifikasi Pengajuan <span class="req">*</span></label><textarea class="form-control" style="min-height:90px" placeholder="Jelaskan alasan mengapa recovery ini diperlukan...">${c.recovery?.justification||''}</textarea></div>
+      <div class="form-group" style="margin-bottom:16px"><label>Perlu Approval? <span class="req">*</span></label><select class="form-control"><option selected>Ya — Supervisor / Manager</option><option>Tidak — Langsung Eksekusi</option></select></div>
+      <div class="flex justify-end gap-3">
+        <button class="btn btn-secondary">Simpan Draft</button>
+        <button class="btn btn-primary" onclick="submitSRO('${c.id}')">📤 Submit ke Approval</button>
+      </div>
+    </div>`;
+}
+function toggleSROAmount(){
+  const type = document.getElementById('sro-type')?.value;
+  const ag = document.getElementById('sro-amount-group');
+  if(ag) ag.style.display = type==='Permohonan Maaf Resmi' ? 'none' : 'flex';
+}
+function submitSRO(id){
+  showAlert('sro-alert','success','✓ Pengajuan berhasil dikirim ke Supervisor/Manager untuk di-approve!');
+  showToast('success','Recovery untuk '+id+' dikirim ke Approval');
+}
+
+// ============ APPROVAL ============
+function processApproval(id, action){
+  if(action==='approve'){
+    showToast('success','✓ Service Recovery untuk '+id+' DISETUJUI. Eksekusi segera!');
+  } else {
+    showToast('error','✗ Pengajuan untuk '+id+' ditolak. Service Recovery Officer akan merevisi.');
+  }
+}
+
+// ============ NEW COMPLAINT ============
+function submitNewComplaint(){
+  const name = document.getElementById('nc-name').value;
+  const newId = 'CC-20260705-00'+(Math.floor(Math.random()*10)+13);
+  showToast('success','✓ Tiket '+newId+' berhasil dibuat untuk pelanggan '+name+'!');
+  setTimeout(()=>navigateTo('page-complaints'), 800);
+}
+
+// ============ TICKET MODAL ============
+function openTicketModal(id){
+  const c = complaints.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('modal-title').textContent = c.id+' — '+c.customer;
+  document.getElementById('modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="info-item"><label>Status Tiket</label><span>${getStatusBadge(c)}</span></div>
+      <div class="info-item"><label>Priority</label><span>${getPriorityBadge(c.priority)}</span></div>
+      <div class="info-item"><label>Pelanggan</label><span>${c.customer} ${c.type!=='Regular'?`<span class="badge ${c.type==='VIP'?'badge-vip':'badge-premium'}">${c.type}</span>`:''}</span></div>
+      <div class="info-item"><label>Channel</label><span><span class="channel-tag">${c.channel}</span></span></div>
+      <div class="info-item"><label>Kategori</label><span>${c.category}</span></div>
+      <div class="info-item"><label>Severity</label><span>${c.severity}</span></div>
+      <div class="info-item"><label>SLA Target</label><span>${c.sla}</span></div>
+      <div class="info-item"><label>Unit Assigned</label><span>${c.assigned||'Belum ditugaskan'}</span></div>
+    </div>
+    <div class="info-item" style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Deskripsi Masalah</label><div class="desc-box" style="margin-top:4px">"${c.desc}"</div></div>
+    ${c.recovery?`<div style="background:#fce7f3;border:1px solid #f9a8d4;border-radius:8px;padding:14px;margin-bottom:14px"><div style="font-weight:700;font-size:13px;color:#9d174d;margin-bottom:8px">🛠️ Service Recovery Diajukan</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="info-item"><label>Jenis</label><span>${c.recovery.type}</span></div><div class="info-item"><label>Nilai</label><span>${c.recovery.amount}</span></div></div><div style="margin-top:8px;font-size:13px"><strong>Justifikasi:</strong> ${c.recovery.justification}</div></div>`:''}
+    <div style="margin-top:4px"><div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:10px">📅 Riwayat Aktivitas</div>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot done"></div><div class="tl-time">${c.date} WIB</div><div class="tl-text">Tiket dibuat & dicatat oleh ${c.loggedBy}</div></div>
+      ${c.status!=='Registered'?`<div class="tl-item"><div class="tl-dot done"></div><div class="tl-time">${c.date.split(' ')[0]+' '+c.date.split(' ')[1]} WIB</div><div class="tl-text">Triase & Assignment — Dialokasikan ke ${c.assigned||'Unit PIC'}</div></div>`:''}
+      ${c.status==='In Investigation'||c.status==='SLA Breach'||c.status==='Service Recovery'||c.status==='Awaiting Approval'||c.status==='Closed'?`<div class="tl-item"><div class="tl-dot ${c.status==='Closed'?'done':'active'}"></div><div class="tl-time">—</div><div class="tl-text">Investigasi oleh ${c.assigned||'Unit PIC'}</div></div>`:''}
+      ${c.status==='Service Recovery'||c.status==='Awaiting Approval'?`<div class="tl-item"><div class="tl-dot active"></div><div class="tl-time">—</div><div class="tl-text">Service Recovery diajukan — menunggu proses approval</div></div>`:''}
+      ${c.status==='Closed'?`<div class="tl-item"><div class="tl-dot done"></div><div class="tl-time">—</div><div class="tl-text">Tiket ditutup — pelanggan konfirmasi puas ✓</div></div>`:''}
+      ${c.status!=='Closed'?`<div class="tl-item"><div class="tl-dot pending"></div><div class="tl-time">—</div><div class="tl-text" style="color:var(--text-muted)">Menunggu proses selanjutnya...</div></div>`:''}
+    </div></div>`;
+
+  const footer = document.getElementById('modal-footer');
+  footer.innerHTML = '';
+  if(c.status==='Closed'){
+    footer.innerHTML = `<span style="color:var(--success);font-weight:700;font-size:13px">✓ Tiket Selesai & Ditutup</span>`;
+  } else if(c.status!=='SLA Breach'&&c.status!=='Awaiting Approval'){
+    footer.innerHTML = `<button class="btn btn-secondary" onclick="closeModal()">Tutup</button><button class="btn btn-success" onclick="closeTicket('${c.id}')">✓ Tandai Selesai & Tutup Tiket</button>`;
+  } else {
+    footer.innerHTML = `<button class="btn btn-secondary" onclick="closeModal()">Tutup</button>`;
+  }
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function closeTicket(id){
+  showToast('success','✓ Tiket '+id+' berhasil ditutup. Pelanggan akan dikirim notifikasi penyelesaian.');
+  closeModal();
+}
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+
+// ============ HELPERS ============
+function showAlert(id, type, msg){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.className = 'alert alert-'+type;
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(()=>{el.style.display='none';}, 4500);
+}
+
+function showToast(type, msg){
+  const container = document.getElementById('toast');
+  const el = document.createElement('div');
+  const icons = {success:'✓',error:'✗',warning:'⚠',info:'ℹ'};
+  el.className = `toast-item toast-${type}`;
+  el.innerHTML = `<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
+  container.appendChild(el);
+  setTimeout(()=>el.classList.add('show'), 50);
+  setTimeout(()=>{el.classList.remove('show'); setTimeout(()=>el.remove(), 350);}, 4000);
+}
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', ()=>{});
+</script>
+</body>
+</html>
